@@ -1,6 +1,6 @@
 # PriliBot
 
-עוזר אישי ב-Telegram לתחום הכלכלה והשקעות. ארבע יכולות מרכזיות:
+עוזר אישי ב-Telegram לתחום הכלכלה והשקעות — **משתמש יחיד** (הבעלים בלבד). ארבע יכולות מרכזיות:
 
 1. **סקירת חדשות יומית** — תקציר יומי של חדשות כלכלה ושוק ההון
 2. **המלצות מניות** — ניתוח והמלצות לפי קריטריונים שהמשתמש מגדיר מראש
@@ -83,7 +83,8 @@ data/
 - yfinance: מניות ישראליות מסתיימות ב-`.TA` (לדוגמה `TEVA.TA`), ת"א 35 = `TA35.TA`
 - `asyncio.to_thread` משמש לכל קריאה blocking (Groq API, yfinance, feedparser)
 - היסטוריית שיחה ב-RAM בלבד — מתאפסת עם restart
-- **Groq rate limits (free tier):** ~30 req/min, ~14,400 req/day — לשמור בחשבון בעיצוב הזרימה
+- **משתמש יחיד** — אין צורך ב-rate limiting, multi-user protection, או הגנה על נתוני משתמשים
+- **Groq rate limits (free tier):** ~30 req/min, ~14,400 req/day — מספיק בנוחות למשתמש יחיד
 - **LLM provider:** Groq API — `pip install groq`. מפתח ב-`GROQ_API_KEY`
 - **Function calling:** Groq תומך ב-tool use עם LLaMA 3.3 70B — מבנה זהה ל-OpenAI
 
