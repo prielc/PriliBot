@@ -4,6 +4,7 @@ __pycache__/
 .env
 data/prilibot.db
 .DS_Store
+logs/
 .pytest_cache/
 *.egg-info/
 dist/
