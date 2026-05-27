@@ -89,7 +89,7 @@ data/
 - **Function calling:** Groq תומך ב-tool use עם LLaMA 3.3 70B — מבנה זהה ל-OpenAI
 
 ## Notes for Claude
-1. "Before writing any code, describe your approach and wait for approval. Always ask clarifying questions before writing any code if requirements are ambiguous."
+1. "Before writing any code, describe your approach and wait for approval. Always ask clarifying questions before writing any code if requirements are ambiguous. After the approach description, add 2-3 simple sentences explaining what this stage/feature does in plain language (no jargon)."
 
 2. "If a task requires changes to more than 3 files, stop and break it into smaller tasks first."
 
