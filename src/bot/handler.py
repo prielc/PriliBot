@@ -4,7 +4,7 @@ from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, ContextTypes, filters
 from src.agent.agent import PriliAgent
 from src.db import database as db
-from src.config.settings import DAILY_DIGEST_HOUR, DAILY_DIGEST_MINUTE, TIMEZONE
+from src.config.settings import DAILY_DIGEST_HOUR, DAILY_DIGEST_MINUTE, TIMEZONE, ALERTS_POLL_INTERVAL
 
 logger = logging.getLogger(__name__)
 
@@ -89,6 +89,18 @@ async def daily_digest_job(context: ContextTypes.DEFAULT_TYPE) -> None:
         logger.error("Daily digest job failed: %s", e)
 
 
+# ------------------------------------------------------------------
+# Alerts job
+# ------------------------------------------------------------------
+
+async def alerts_job(context: ContextTypes.DEFAULT_TYPE) -> None:
+    from src.services.alerts import check_alerts
+    try:
+        await check_alerts(context.bot)
+    except Exception as e:
+        logger.error("Alerts job failed: %s", e)
+
+
 async def _get_active_user(context: ContextTypes.DEFAULT_TYPE) -> int | None:
     from src.db import database as db
     row = db.execute("SELECT telegram_id FROM users WHERE is_active = 1 LIMIT 1").fetchone()
@@ -112,7 +124,13 @@ def setup(app: Application, agent: PriliAgent) -> None:
         time=_make_digest_time(),
         name="daily_digest",
     )
-    logger.info("Bot handlers and daily job registered")
+    app.job_queue.run_repeating(
+        alerts_job,
+        interval=ALERTS_POLL_INTERVAL,
+        first=60,
+        name="alerts",
+    )
+    logger.info("Bot handlers, daily digest and alerts jobs registered")
 
 
 def _make_digest_time():
