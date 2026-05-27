@@ -77,7 +77,22 @@ async def message_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 
 async def daily_digest_job(context: ContextTypes.DEFAULT_TYPE) -> None:
     logger.info("Daily digest job triggered")
-    # Implemented in Stage 5
+    try:
+        digest = await asyncio.to_thread(_agent.generate_daily_digest)
+        user = await _get_active_user(context)
+        if user:
+            await context.bot.send_message(chat_id=user, text=f"📰 *סקירת בוקר*\n\n{digest}", parse_mode="Markdown")
+            logger.info("Daily digest sent to user %d", user)
+        else:
+            logger.warning("No active user found for daily digest")
+    except Exception as e:
+        logger.error("Daily digest job failed: %s", e)
+
+
+async def _get_active_user(context: ContextTypes.DEFAULT_TYPE) -> int | None:
+    from src.db import database as db
+    row = db.execute("SELECT telegram_id FROM users WHERE is_active = 1 LIMIT 1").fetchone()
+    return row["telegram_id"] if row else None
 
 
 # ------------------------------------------------------------------

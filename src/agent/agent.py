@@ -35,8 +35,36 @@ class PriliAgent:
         return response_text
 
     def generate_daily_digest(self) -> str:
-        # Placeholder — implemented in Stage 5
-        return "הסקירה היומית תהיה זמינה בקרוב."
+        from src.services.stocks import get_market_summary
+        from src.services.news import get_financial_news
+
+        market = get_market_summary()
+        news = get_financial_news(max_results=5)
+
+        market_text = "\n".join(
+            f"- {name}: {data.get('price', 'N/A')} ({data.get('change_pct', 'N/A')}%)"
+            if "error" not in data else f"- {name}: לא זמין"
+            for name, data in market.items()
+        )
+        news_text = "\n".join(
+            f"- {a['title']} ({a['source']})" for a in news
+        ) if news else "לא נמצאו חדשות"
+
+        prompt = (
+            f"סכם את המצב הכלכלי של הבוקר בעברית בצורה תמציתית ומקצועית.\n\n"
+            f"מדדים:\n{market_text}\n\n"
+            f"כותרות חדשות:\n{news_text}\n\n"
+            "כתוב סקירת בוקר קצרה (3-5 משפטים) שמסכמת את המצב ומדגישה נקודות חשובות."
+        )
+
+        response = self._client.chat.completions.create(
+            model=GROQ_MODEL,
+            messages=[
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": prompt},
+            ],
+        )
+        return response.choices[0].message.content or "לא הצלחתי להכין סקירה יומית."
 
     def clear_session(self, user_id: int) -> None:
         self._sessions.pop(user_id, None)
